@@ -1,0 +1,122 @@
+
+
+
+
+
+
+
+1 - 2 - 3 - 4 - {567} = 12345,12346,12347		-> 3 3
+            5 - {67} = 12356,12357					-> 2 5
+					  6 - {7} = 12367									-> 1 6
+        4 - 5 - {67} = 12456,12457					-> 2 8
+				    6 - {7} = 12467									-> 1 9
+				5 - 6 - {7} = 12567									-> 1 10
+		3 - 4 - 5 - {67} = 13456,13457					-> 2 12
+		        6 - {7} = 13467									-> 1 13
+				5 - 6 - {7} = 13567									-> 1 14
+		4 - 5 - 6 - {7} = 14567									-> 1 15
+2 - 3 - 4 - 5 - {67} = 23456,23457					-> 2 17
+            6 - {7} = 23467									-> 1 18
+				5 - 6 - {7} = 23567									-> 1 19
+		4 - 5 - 6 - {7} = 24567									-> 1 20
+3 - 4 - 5 - 6 - {7} = 34567									-> 1 21
+---------------------------------------------------
+
+15 16 17
+17 18
+19
+18 19
+20
+19 20
+21
+22
+23
+20 21
+22
+23
+24
+25
+
+
+
+1 2 3 4 5 6 7 -> 2 3 4 5 6 7 -> 3 4 5 6 7
+														 -> 2 4 5 6 7
+														 -> 2 3 5 6 7
+														 -> 2 3 4 6 7
+														 -> 2 3 4 5 7
+														 -> 2 3 4 5 6
+							-> 1 3 4 5 6 7 -> 3 4 5 6 7 X
+														 -> 1 4 5 6 7
+														 -> 1 3 5 6 7
+														 -> 1 3 4 6 7
+														 -> 1 3 4 5 7
+														 -> 1 3 4 5 6
+							-> 1 2 4 5 6 7 -> 2 4 5 6 7 X
+														 -> 1 4 5 6 7 X
+														 -> 1 2 5 6 7
+														 -> 1 2 4 6 7
+														 -> 1 2 4 5 7
+														 -> 1 2 4 5 6
+							-> 1 2 3 5 6 7 -> 2 3 5 6 7 X
+														 -> 1 3 5 6 7 X
+														 -> 1 2 5 6 7 X
+														 -> 1 2 3 6 7
+														 -> 1 2 3 5 7
+														 -> 1 2 3 5 6
+							-> 1 2 3 4 6 7 -> 2 3 4 6 7 X
+														 -> 1 3 4 6 7 X
+														 -> 1 2 4 6 7 X
+														 -> 1 2 3 6 7 X
+														 -> 1 2 3 4 7
+														 -> 1 2 3 4 6
+							-> 1 2 3 4 5 7 -> 2 3 4 5 7 X
+														 -> 1 3 4 5 7 X
+														 -> 1 2 4 5 7 X
+														 -> 1 2 3 5 7 X
+														 -> 1 2 3 4 7 X
+														 -> 1 2 3 4 5
+							-> 1 2 3 4 5 6 -> 2 3 4 5 6 X
+														 -> 1 3 4 5 6 X
+														 -> 1 2 4 5 6 X
+														 -> 1 2 3 5 6 X
+														 -> 1 2 3 4 6 X
+														 -> 1 2 3 4 5 X
+
+if there is two or more pairs in P{2}
+	1. if two pairs,
+			a. if they are same: impossible (prove by (1 2) (3 4), the powerset must contain (2 3) and this should be a pair, too. contradiction)
+			b. if they are different: two pair
+	2. if three pairs,
+			a. if they are all same: three of a kind (prove by this way: there is only two possible way for this case: either four or three.
+					five or higher never be applied in poker because the number of suite is four. Suppose four of a kind only uses three pairs.
+					Let 1 2 3 4 are same number, then we can imply (1 2) (2 3) (3 4), but (1 3) or (1 4) also can be a pair. This contradicts our
+					initial assumption that four only uses three pairs. proved)
+			b. if one is different: impossible (suppose (1 2) (2 3) (4 5). but (1 3) should be pair)
+			c. if none is same: impossible (since we only have 5 cards, 3 distinguished pair cannot be applied)
+	3. if four pairs,
+			a. if they are all same: impossible ( (1 2) (1 3) (2 3) + any other same pair must be four-kind by the pigeonholl principle
+					and four-kind must have exactly 6 pairs - (1 2) (1 3) (1 4) (2 3) (2 4) (3 4). )
+			b. if two and two: impossible
+			c. if three and one: full house
+	4. if six pairs,
+			four card
+
+
+summary (#pair: hands)
+	1: one pair
+	2: two pair
+	3: three-kind
+	4: full house
+	6: four card (5 or more)
+
+
+point count 
+high: 13 
+one pair: 13
+two pair: 13*12
+three-kind: 13
+straight: 10 (compare second least number, 2 to J)
+flush: 13
+full house: 13*12
+four: 13
+straight flush: 10 (2 to J)
