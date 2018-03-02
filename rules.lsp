@@ -1,4 +1,6 @@
 
+(defun reload () (load "rules.lsp"))
+
 (setq maxNum 13)
 ;(suite)*13 + (number) = cardnum
 ;notate: suite = {S:1,C:2,H:3,D:4}, number = {A:13,2:1,3:2,4:3,5:4,6:5,7:6,8:7,9:8,T:9,J:10,Q:11,K:12}
@@ -98,37 +100,104 @@
 				)
 	)
 
-;helper function for score_one_pair
-(defun score_pairs_rec (pair_set)
+(defun score_single_pair_helper (pair_set);for 'of a kind'
 	(cond ((null pair_set) 0)
-				((listp pair_set)
-				 (max
-					 (cond ((same_num (car pair_set)) (num (car (car pair_set))))
-								 (T 0)
-								 )
-					 (score_pairs_rec (cdr pair_set))
-					 )
-				 )
+				((and (listp pair_set) (same_num (car pair_set))) (caar pair_set))
+				((listp pair_set) (sop_helper (cdr pair_set)))
 				(T 0)
 				)
 	)
 
-; this returns max score of one pair from the given cards
-(defun score_pairs (card)
+(defun score_double_pair_helper (pair_set fpair); for t-pair and f. house
+	(cond ((null pair_set) 0)
+				((and (listp pair_set) (same_num (car pair_set)))
+				 (cond ((null fpair) (sop_helper (cdr pair_set) (caar pair_set)))
+							 (T (* fpair (caar pair_set)))
+							 )
+				 )
+				(T (sop_helper (cdr pair_set) fpair))
+				)
+	)
+
+(defun score_pair (card hands);
 	(let ((pair_set (all_hands card 2)))
-		(score_pairs_rec pair_set)
+		(cond ((or (= hands 1) (= hands 3) (= hands 7)) (score_single_pair_helper pair_set))
+					(T (score_double_pair_helper pair_set NIL))
+					)
 		)
 	)
 
-(defun check_pairs (pair_set)
+(defun cp_helper (pair_set)
 	(cond ((null pair_set) 0)
-				((and (listp pair_set) (same_num (car pair_set))) (+ 1 (check_pairs (cdr pair_set))))
-				((listp pair_set) (check_pairs (cdr pair_set)))
+				((and (listp pair_set) (same_num (car pair_set))) (+ 1 (cp_helper (cdr pair_set))))
+				((listp pair_set) (cp_helper (cdr pair_set)))
 				(T 0)
+				)
+	)
+
+(defun check_pair (card)
+	(let* ((pair_set (all_hands card 2))
+				(score (cp_helper pair_set)))
+		(cond ((= score 4) 6)
+					((= score 6) 7)
+					(T score)
+					)
+		)
+	)
+
+
+(defun cs_helper (card)
+	(cond ((null card) NIL)
+				((null (cadr card)) T)
+				((= (+ (num (car card)) 1) (num (cadr card))) (cs_helper (cdr card)))
+				((and (= (num (cadr card)) 13) (= (num (car card)) 4)) T)
+				(T NIL)
 				)
 	)
 
 (defun check_straight (card)
-	
+	(cs_helper (sort card #'<))
+	)
 
-																													 
+(defun score_straight (card)
+	(let ((scard (sort card #'>)))
+		(cond ((and (= (car scard) 13) (< (cadr scard) 11)) 1)
+					(T (car scard))
+					)
+		)
+	)
+
+(defun check_flush (card)
+	(cond ((null card) NIL)
+				((not (listp card)) T)
+				((null (cadr card)) T)
+				((= (suite (car card)) (suite (cadr card))) (check_flush (cdr card)))
+				(T NIL)
+				)
+	)
+
+(defun score_flush (card)
+	(num (car (sort card #'>)))
+	)
+
+
+(defun highest_hand (card)
+	(let ((straight (check_straight card))
+				(flush (check_flush card))
+				(pairs (check_pair card)))
+		(cond ((and straight flush) 8)
+					((> pairs 5) pairs)
+					(flush 5)
+					(straight 4)
+					((> pairs 0) pairs)
+					(T 0)
+					)
+		)
+	)
+
+(defun highest_card (card)
+	(card_to_num (sort card #'>))
+	)
+
+(defun game_winner (cards)
+	(a:
