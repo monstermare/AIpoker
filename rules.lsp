@@ -1,7 +1,7 @@
 
 (defun reload () (load "rules.lsp"))
 
-(setq maxNum 13)
+(setq MAXNUM 13)
 ;(suite)*13 + (number) = cardnum
 ;notate: suite = {S:1,C:2,H:3,D:4}, number = {A:13,2:1,3:2,4:3,5:4,6:5,7:6,8:7,9:8,T:9,J:10,Q:11,K:12}
 ;high-pair-2pair-triple-straight-flush-f.house-four-s.flush-royal s.flush
@@ -50,7 +50,7 @@
 
 ;return the number of card
 (defun num (card)
-	(let ((m (mod card maxNum))
+	(let ((m (mod card MAXNUM))
 				)
 		(cond ((and (> card 0) (= m 0)) 13)
 					((> card 0) m)
@@ -61,7 +61,7 @@
 
 ;return the suite of card
 (defun suite (card)
-	(ceiling (/ card maxNum))
+	(ceiling (/ card MAXNUM))
 	)
 
 ;check if all cards have same number
@@ -199,5 +199,49 @@
 	(card_to_num (sort card #'>))
 	)
 
+(defun compare_high (c1 c2)
+	(let ((n1 (num (car c1)))
+				(n2 (num (car c2)))
+				)
+		(cond ((or (null c1) (null c2)) 0)
+					((> n1 n2) 1)
+					((< n1 n2) 2)
+					(T (compare_high (cdr c1) (cdr c2)))
+					)
+		)
+	)
+
+(defun set_winner (cand hand)
+	(list (car cand) hand (list (cadr cand)))
+	)
+
+(defun gw_helper (cand win); for cwin, first=card,second=hand,last=player(s)
+	(cond ((null cand) win)
+				(T (let* ((wcard (first win))
+									(whand (second win))
+									(ccard (caar cand))
+									(chand (highest_hand ccard))
+									(rcand (cdr cand))
+									)
+						 (cond ((> whand chand) (gw_helper rcand win))
+									 ((< whand chand) (gw_helper rcand (set_winner (car cand) chand)))
+									 (T
+										 (let* ((whigh (highest_card wcard))
+														(chigh (highest_card ccard))
+														(result (compare_high whigh chigh))
+														)
+											 (cond ((> result 1) (gw_helper rcand (set_winner (car cand) chand)))
+														 ((> result 0) (gw_helper rcand win))
+														 (T (gw_helper rcand (list wcard whand (cons (cadar cand) (third win))))); tie
+														 )
+											 )
+										 )
+									 )
+						 )
+					 )
+				)
+	)
+
 (defun game_winner (cards)
-	(a:
+	(gw_helper (cdr cards) (set_winner (car cards) (highest_hand (caar cards))))
+	)
