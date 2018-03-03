@@ -1,1 +1,1 @@
-# AI poker
+# AI poker game
