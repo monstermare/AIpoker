@@ -242,6 +242,9 @@
 				)
 	)
 
+; example
+; (setq a '(((1 2 3 4 5) 1) ((6 7 8 9 10) 2) ((11 12 13 14 15) 3) ((16 17 18 19 20) 4))
+; (game_winner a)
 (defun game_winner (cards)
 	(gw_helper (cdr cards) (set_winner (car cards) (highest_hand (caar cards))))
 	)
